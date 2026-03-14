@@ -1,0 +1,27 @@
+:root { --primary: #00d2ff; --bg-dark: #0a0c10; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1); }
+body { background-color: var(--bg-dark); color: white; font-family: 'Inter', sans-serif; margin: 0; }
+.navbar { padding: 20px 5%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); }
+.logo { font-size: 1.5rem; font-weight: 900; text-decoration: none; color: white; }
+.logo span { color: var(--primary); }
+.container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+.movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
+.movie-card { background: var(--glass); border-radius: 15px; border: 1px solid var(--glass-border); overflow: hidden; text-decoration: none; color: white; transition: 0.3s; }
+.movie-card:hover { transform: translateY(-10px); border-color: var(--primary); }
+.poster { width: 100%; height: 350px; object-fit: cover; }
+.movie-info { padding: 15px; text-align: center; font-weight: bold; }
+
+/* Choice Page Cards */
+.choice-card { background: var(--glass); border: 1px solid var(--glass-border); padding: 40px; border-radius: 20px; width: 280px; text-decoration: none; color: white; transition: 0.3s; backdrop-filter: blur(15px); }
+.choice-card:hover { transform: scale(1.05); border-color: var(--primary); background: rgba(0, 210, 255, 0.1); }
+.choice-card .icon { font-size: 4rem; margin-bottom: 15px; }
+
+/* Player UI */
+.page-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; filter: blur(30px); background-size: cover; background-position: center; }
+.player-wrapper { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+.video-box { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); border: 1px solid var(--glass-border); }
+video { width: 100%; height: 100%; }
+.details { margin-top: 30px; padding: 30px; background: var(--glass); border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); }
+.ep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 8px; margin-top: 15px; }
+.ep-btn { background: var(--glass); border: 1px solid var(--glass-border); color: white; padding: 12px; text-decoration: none; border-radius: 8px; text-align: center; font-size: 0.85rem; }
+.ep-btn:hover, .ep-btn.active { background: var(--primary); color: black; font-weight: bold; border-color: white; }
+.back-btn { color: var(--primary); text-decoration: none; font-weight: bold; }

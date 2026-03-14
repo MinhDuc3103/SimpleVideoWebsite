@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Format - {{ config.title }}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+
+.top-logo{
+    width:100%;
+    text-align:center;
+    padding:15px 0;
+    position:relative;
+    z-index:10;
+}
+
+.top-logo .logo{
+    font-family:'Inter',sans-serif;
+    font-weight:900;
+    font-size:26px;
+    color:white;
+    text-decoration:none;
+}
+
+.top-logo .logo span{
+    color:var(--primary);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="top-logo">
+    <a href="/" class="logo">NHƯ LÙN<span>CINEMA</span></a>
+</div>
+
+<div class="page-bg" style="background-image: linear-gradient(rgba(10,12,16,0.85), #0a0c10), url('{{ config.poster }}');"></div>
+
+<div class="container" style="text-align: center; margin-top: 80px;">
+
+    <h1 style="font-size: 3.5rem; margin-bottom: 10px;">
+        {{ config.title }}
+    </h1>
+
+    <p style="color: #ccc; margin-bottom: 50px;">
+        Please choose a format to browse episodes.
+    </p>
+
+    <div style="display: flex; justify-content: center; gap: 40px;">
+
+        <a href="/player/{{ slug }}/series" class="choice-card">
+            <div class="icon">📺</div>
+            <h2>Series</h2>
+            <p>TV Episodes</p>
+        </a>
+
+        <a href="/player/{{ slug }}/movies" class="choice-card">
+            <div class="icon">🎬</div>
+            <h2>Movies</h2>
+            <p>Feature Films</p>
+        </a>
+
+    </div>
+
+    <br><br>
+
+    <a href="/" class="back-btn">
+        ← Back to Collections
+    </a>
+
+</div>
+
+</body>
+</html>

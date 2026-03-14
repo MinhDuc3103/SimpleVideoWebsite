@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Private Cinema</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar"><a href="/" class="logo">NHƯ LÙN<span>CINEMA</span></a></nav>
+    <div class="container">
+        <h2 class="section-title">My Collections</h2>
+        <div class="movie-grid">
+            {% for slug, info in configs.items() %}
+            <a href="/choice/{{ slug }}" class="movie-card">
+                <img src="{{ info.poster }}" class="poster">
+                <div class="movie-info">{{ info.title }}</div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

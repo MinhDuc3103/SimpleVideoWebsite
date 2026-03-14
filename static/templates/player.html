@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>{{ config.title }} - Playing</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+
+.top-logo{
+width:100%;
+text-align:center;
+padding:15px 0;
+position:relative;
+z-index:10;
+}
+
+.top-logo .logo{
+font-family:'Inter',sans-serif;
+font-weight:900;
+font-size:26px;
+color:white;
+text-decoration:none;
+}
+
+.top-logo .logo span{
+color:var(--primary);
+}
+
+.video-js{
+width:100%;
+max-width:100%;
+height:500px;
+border-radius:8px;
+}
+
+@media (max-width:768px){
+.video-js{
+height:250px;
+}
+}
+
+/* EMPTY MESSAGE STYLE */
+
+.empty-message{
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+height:400px;
+font-size:26px;
+font-weight:700;
+color:white;
+opacity:0.9;
+padding:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="top-logo">
+<a href="/" class="logo">NHƯ LÙN<span>CINEMA</span></a>
+</div>
+
+<div class="page-bg"
+style="background-image:linear-gradient(rgba(10,12,16,0.85),#0a0c10),url('{{ config.poster }}');">
+</div>
+
+<div class="player-wrapper">
+
+<div style="display:flex;justify-content:space-between;align-items:center;">
+
+<a href="/choice/{{ slug }}" class="back-btn">
+← Switch Format
+</a>
+
+<span style="color:var(--primary);font-weight:bold;">
+{{ content_type | upper }} MODE
+</span>
+
+</div>
+
+<h1 style="margin:15px 0;">
+{{ config.title }}
+</h1>
+
+{% if message %}
+
+<div class="empty-message">
+{{ message }}
+</div>
+
+{% else %}
+
+<p style="color:#aaa;margin-bottom:20px;">
+Playing: {{ current_ep.filename }}
+</p>
+
+<div class="video-box">
+
+<video
+id="my-video"
+class="video-js vjs-big-play-centered"
+controls
+preload="auto"
+playsinline
+webkit-playsinline
+data-setup='{}'>
+
+<source 
+src="{{ url_for('video_stream', slug=slug, content_type=content_type, filename=current_ep.filename, _external=True, _scheme='https') }}" 
+type="video/mp4">
+
+<p class="vjs-no-js">
+To view this video please enable JavaScript and use a modern browser.
+</p>
+
+</video>
+
+</div>
+
+<div class="details">
+
+<h3>Select Episode</h3>
+
+<div class="ep-grid">
+
+{% for ep in episodes %}
+
+<a
+href="/player/{{ slug }}/{{ content_type }}/{{ loop.index0 }}"
+class="ep-btn {% if ep_index == loop.index0 %}active{% endif %}">
+
+{{ ep.num }}
+
+</a>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endif %}
+
+</div>
+
+<script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
+{% if not message %}
+<script>
+var player = videojs('my-video');
+</script>
+{% endif %}
+
+</body>
+</html>
