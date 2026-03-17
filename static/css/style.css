@@ -1,27 +1,851 @@
-:root { --primary: #00d2ff; --bg-dark: #0a0c10; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1); }
-body { background-color: var(--bg-dark); color: white; font-family: 'Inter', sans-serif; margin: 0; }
-.navbar { padding: 20px 5%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); }
-.logo { font-size: 1.5rem; font-weight: 900; text-decoration: none; color: white; }
-.logo span { color: var(--primary); }
-.container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-.movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
-.movie-card { background: var(--glass); border-radius: 15px; border: 1px solid var(--glass-border); overflow: hidden; text-decoration: none; color: white; transition: 0.3s; }
-.movie-card:hover { transform: translateY(-10px); border-color: var(--primary); }
-.poster { width: 100%; height: 350px; object-fit: cover; }
-.movie-info { padding: 15px; text-align: center; font-weight: bold; }
+:root {
+    --yellow: #FFD700;
+    --yellow-dim: rgba(255, 215, 0, 0.12);
+    --bg: #141414;
+    --bg-card: #181818;
+    --bg-elevated: #232323;
+    --text-muted: #808080;
+    --text-secondary: #b3b3b3;
+}
 
-/* Choice Page Cards */
-.choice-card { background: var(--glass); border: 1px solid var(--glass-border); padding: 40px; border-radius: 20px; width: 280px; text-decoration: none; color: white; transition: 0.3s; backdrop-filter: blur(15px); }
-.choice-card:hover { transform: scale(1.05); border-color: var(--primary); background: rgba(0, 210, 255, 0.1); }
-.choice-card .icon { font-size: 4rem; margin-bottom: 15px; }
+* { box-sizing: border-box; }
 
-/* Player UI */
-.page-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; filter: blur(30px); background-size: cover; background-position: center; }
-.player-wrapper { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-.video-box { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); border: 1px solid var(--glass-border); }
-video { width: 100%; height: 100%; }
-.details { margin-top: 30px; padding: 30px; background: var(--glass); border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); }
-.ep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 8px; margin-top: 15px; }
-.ep-btn { background: var(--glass); border: 1px solid var(--glass-border); color: white; padding: 12px; text-decoration: none; border-radius: 8px; text-align: center; font-size: 0.85rem; }
-.ep-btn:hover, .ep-btn.active { background: var(--primary); color: black; font-weight: bold; border-color: white; }
-.back-btn { color: var(--primary); text-decoration: none; font-weight: bold; }
+body {
+    background: var(--bg);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+}
+
+/* ── Navbar ── */
+.navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    padding: 18px 4%;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(20,20,20,0.96) 0%, transparent 100%);
+    transition: background 0.4s;
+}
+
+.navbar.solid {
+    background: rgba(20,20,20,0.98);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* ── Logo ── */
+.logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.logo-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 2px solid var(--yellow);
+    flex-shrink: 0;
+}
+
+.logo-text {
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    line-height: 1;
+}
+
+.logo-name  { color: var(--yellow); }
+.logo-suffix { color: #fff; margin-left: 3px; }
+
+/* ── Hero (index) ── */
+.hero {
+    position: relative;
+    height: 85vh;
+    min-height: 520px;
+    display: flex;
+    align-items: flex-end;
+    background-size: cover;
+    background-position: center 20%;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(to right,  rgba(20,20,20,0.90) 0%, rgba(20,20,20,0.10) 65%),
+        linear-gradient(to top,    rgba(20,20,20,1.00) 0%, rgba(20,20,20,0.40) 18%, transparent 45%);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    padding: 0 4% 88px;
+    max-width: 580px;
+}
+
+.hero-badge {
+    display: inline-block;
+    background: var(--yellow);
+    color: #000;
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+    margin-bottom: 16px;
+}
+
+.hero-title {
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 900;
+    margin: 0 0 14px;
+    line-height: 1.1;
+}
+
+.hero-desc {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0 0 28px;
+    line-height: 1.6;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--yellow);
+    color: #000;
+    font-weight: 800;
+    font-size: 0.95rem;
+    padding: 12px 28px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.btn-primary:hover { background: #e6c200; transform: scale(1.04); }
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 12px 28px;
+    border-radius: 5px;
+    text-decoration: none;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s;
+}
+
+.btn-secondary:hover { background: rgba(255,255,255,0.25); }
+
+/* ── Collections ── */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 4% 60px;
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin: 36px 0 16px;
+    padding-left: 12px;
+    border-left: 3px solid var(--yellow);
+}
+
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+}
+
+.movie-card {
+    position: relative;
+    display: block;
+    text-decoration: none;
+    color: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--bg-card);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, z-index 0s 0.25s;
+}
+
+.movie-card:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 48px rgba(0,0,0,0.85);
+    z-index: 10;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.poster {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    display: block;
+}
+
+.movie-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 28px 12px 12px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.88));
+    font-size: 0.85rem;
+    font-weight: 700;
+    transform: translateY(100%);
+    transition: transform 0.25s ease;
+}
+
+.movie-card:hover .movie-info { transform: translateY(0); }
+
+/* ── Shared: blurred page bg ── */
+.page-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    filter: blur(24px) brightness(0.3);
+    transform: scale(1.08);
+}
+
+/* ── Choice Page ── */
+.top-logo {
+    display: flex;
+    justify-content: center;
+    padding: 28px 0 0;
+}
+
+.choice-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 100px);
+    padding: 20px 24px 80px;
+    text-align: center;
+}
+
+.choice-movie-title {
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 900;
+    margin: 0 0 12px;
+}
+
+.choice-desc {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin: 0 0 52px;
+    max-width: 480px;
+    line-height: 1.6;
+}
+
+.choice-cards {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 44px;
+}
+
+.choice-card {
+    background: rgba(24,24,24,0.82);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 38px 44px;
+    border-radius: 12px;
+    width: 240px;
+    text-decoration: none;
+    color: #fff;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    text-align: center;
+    transition: transform 0.25s, border-color 0.25s, background 0.25s, box-shadow 0.25s;
+}
+
+.choice-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--yellow);
+    background: var(--yellow-dim);
+    box-shadow: 0 12px 40px rgba(255,215,0,0.2);
+}
+
+.choice-icon { font-size: 3rem; display: block; margin-bottom: 14px; }
+.choice-card h2 { margin: 0 0 6px; font-size: 1.3rem; }
+.choice-card p  { margin: 0; color: var(--text-muted); font-size: 0.88rem; }
+
+.back-link {
+    color: var(--yellow);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: opacity 0.2s;
+}
+.back-link:hover { opacity: 0.7; }
+
+/* ── Player Navbar ── */
+.player-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    padding: 16px 4%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(20,20,20,0.97) 0%, transparent 100%);
+}
+
+.mode-badge {
+    background: var(--yellow-dim);
+    border: 1px solid rgba(255,215,0,0.3);
+    color: var(--yellow);
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+}
+
+/* ── Player Content ── */
+.player-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 20px 40px;
+}
+
+.video-box {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 20px 70px rgba(0,0,0,0.9);
+}
+
+.video-js {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 8px;
+}
+
+/* Video.js custom theme */
+.vjs-big-play-button {
+    background-color: rgba(255,215,0,0.9) !important;
+    border-color: var(--yellow) !important;
+    border-radius: 50% !important;
+    width: 64px !important;
+    height: 64px !important;
+    line-height: 64px !important;
+    margin-top: -32px !important;
+    margin-left: -32px !important;
+}
+
+.vjs-big-play-button .vjs-icon-placeholder::before {
+    color: #000 !important;
+    font-size: 1.8rem !important;
+    line-height: 64px !important;
+}
+
+.video-js:hover .vjs-big-play-button,
+.video-js .vjs-big-play-button:focus { background-color: var(--yellow) !important; }
+
+.vjs-control-bar {
+    background: linear-gradient(transparent, rgba(0,0,0,0.9)) !important;
+}
+
+.vjs-play-progress  { background: var(--yellow) !important; }
+.vjs-volume-level   { background: var(--yellow) !important; }
+.vjs-load-progress  { background: rgba(255,215,0,0.2) !important; }
+
+/* ── Player info bar ── */
+.player-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.back-btn {
+    color: var(--yellow);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity 0.2s;
+}
+.back-btn:hover { opacity: 0.75; }
+
+.player-title {
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin: 10px 0 4px;
+}
+
+.now-playing {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 0 0 24px;
+}
+
+/* ── Episode Grid ── */
+.details {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 22px 20px;
+    margin-top: 24px;
+}
+
+.details-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.details-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.ep-count {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+}
+
+.ep-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+}
+
+.ep-btn {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16/9;
+    background: linear-gradient(135deg, #1c1c2e 0%, #12121e 100%);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 700;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+}
+
+.ep-btn:hover {
+    transform: scale(1.07);
+    border-color: var(--yellow);
+    box-shadow: 0 6px 24px rgba(255,215,0,0.2);
+    z-index: 5;
+}
+
+.ep-btn.active {
+    border-color: var(--yellow);
+    background: linear-gradient(135deg, #3d3000, #2a2000);
+}
+
+.ep-btn .ep-label {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+}
+
+.ep-btn .ep-num {
+    font-size: 1.25rem;
+    font-weight: 900;
+}
+
+.ep-btn.active .ep-num { color: var(--yellow); }
+
+.ep-btn.active .ep-playing {
+    position: absolute;
+    bottom: 7px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.6rem;
+    font-weight: 800;
+    color: var(--yellow);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* ── Episode Hover Preview Popup ── */
+#ep-preview {
+    position: fixed;
+    width: 300px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #111;
+    border: 2px solid var(--yellow);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,215,0,0.08);
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.9) translateY(6px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+#ep-preview.visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+}
+
+#ep-preview video {
+    width: 100%;
+    aspect-ratio: 16/9;
+    display: block;
+    background: #000;
+}
+
+.preview-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    background: rgba(20,20,20,0.95);
+}
+
+.preview-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--yellow);
+}
+
+.preview-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* Preview caret pointing down to the episode button */
+#ep-preview::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: var(--yellow);
+    border-bottom: none;
+}
+
+/* ── Empty State ── */
+.empty-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 360px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    opacity: 0.8;
+    text-align: center;
+    padding: 20px;
+    background: rgba(255,215,0,0.03);
+    border-radius: 8px;
+    border: 1px dashed rgba(255,215,0,0.12);
+}
+
+/* ── Hero Carousel ── */
+.hero-slider {
+    position: relative;
+    height: 85vh;
+    min-height: 520px;
+    overflow: hidden;
+}
+
+.hero-slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center 20%;
+    display: flex;
+    align-items: flex-end;
+    opacity: 0;
+    transition: opacity 0.9s ease;
+    z-index: 0;
+}
+
+.hero-slide.active {
+    opacity: 1;
+    z-index: 1;
+}
+
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #fff;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    padding: 0;
+}
+
+.slider-btn:hover {
+    background: rgba(0,0,0,0.82);
+    border-color: var(--yellow);
+    transform: translateY(-50%) scale(1.08);
+}
+
+.slider-prev { left: 20px; }
+.slider-next { right: 20px; }
+
+.slider-dots {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.35);
+    cursor: pointer;
+    transition: background 0.25s, transform 0.25s, width 0.25s;
+}
+
+.dot.active {
+    background: var(--yellow);
+    width: 24px;
+    border-radius: 4px;
+}
+
+/* Progress bar at bottom of hero */
+.slider-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    z-index: 10;
+}
+
+.slider-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--yellow);
+}
+
+/* ── Episode Browse Page ── */
+.ep-page-wrapper {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 90px 4% 60px;
+}
+
+.ep-page-header {
+    margin-bottom: 36px;
+}
+
+.ep-page-title {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 900;
+    margin: 0 0 10px;
+}
+
+.ep-page-desc {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin: 0 0 16px;
+    max-width: 560px;
+    line-height: 1.6;
+}
+
+.ep-page-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.ep-total {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+}
+
+/* Episode browse cards grid */
+.ep-browse-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+}
+
+.ep-card {
+    position: relative;
+    text-decoration: none;
+    color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-card);
+    border: 2px solid transparent;
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    display: block;
+}
+
+.ep-card:hover {
+    transform: scale(1.04);
+    border-color: var(--yellow);
+    box-shadow: 0 8px 32px rgba(255,215,0,0.2);
+    z-index: 5;
+}
+
+/* Thumbnail area — video fills it absolutely */
+.ep-card-thumb {
+    position: relative;
+    aspect-ratio: 16/9;
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%);
+    overflow: hidden;
+}
+
+/* The actual video element — invisible until metadata loads */
+.ep-card-thumb video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none; /* clicks pass through to the <a> */
+}
+
+/* Overlay sits on top of the video */
+.ep-card-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* slight dark veil so the number is readable over the video frame */
+    background: rgba(0,0,0,0.28);
+    transition: background 0.3s;
+}
+
+.ep-card:hover .ep-card-overlay {
+    background: rgba(0,0,0,0.08); /* let the video breathe on hover */
+}
+
+/* Big episode number watermark — visible when not hovering */
+.ep-card-num {
+    font-size: 4rem;
+    font-weight: 900;
+    color: rgba(255,255,255,0.18);
+    user-select: none;
+    pointer-events: none;
+    transition: opacity 0.25s;
+    position: absolute;
+}
+
+.ep-card:hover .ep-card-num { opacity: 0; }
+
+/* Play button — hidden normally, pops in on hover */
+.ep-card-play {
+    position: absolute;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(255,215,0,0.92);
+    color: #000;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.7);
+    transition: opacity 0.2s, transform 0.2s;
+    padding-left: 4px;
+    pointer-events: none;
+}
+
+.ep-card:hover .ep-card-play {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.ep-card-info {
+    padding: 10px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--bg-card);
+}
+
+.ep-card-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--yellow);
+    letter-spacing: 0.5px;
+}
+
+.ep-card-title {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .hero-slider { height: 65vh; min-height: 400px; }
+    .hero-content { padding-bottom: 60px; }
+    .slider-btn { width: 38px; height: 38px; font-size: 1.4rem; }
+    .movie-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; }
+    .ep-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
+    .ep-browse-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .player-wrapper { padding: 70px 12px 32px; }
+    .ep-page-wrapper { padding: 70px 4% 40px; }
+    .player-nav { padding: 12px 4%; }
+    .choice-card { width: 100%; padding: 28px 24px; }
+    #ep-preview { display: none; }
+}

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ config.title }} – {{ content_type | title }} - Như Lùn Cinema</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="page-bg" style="background-image: url('{{ config.poster }}');"></div>
+
+<nav class="player-nav">
+    <a href="/" class="logo">
+        <img src="/static/posters/bg.jpg" alt="Logo" class="logo-img">
+        <span class="logo-text">
+            <span class="logo-name">NHƯ LÙN</span><span class="logo-suffix">CINEMA</span>
+        </span>
+    </a>
+    <span class="mode-badge">{{ content_type }} mode</span>
+    <a href="/choice/{{ slug }}" class="back-btn">← Back</a>
+</nav>
+
+<div class="ep-page-wrapper">
+
+    <div class="ep-page-header">
+        <h1 class="ep-page-title">{{ config.title }}</h1>
+        <p class="ep-page-desc">{{ config.desc }}</p>
+        <div class="ep-page-meta">
+            <span class="mode-badge">{{ content_type | upper }}</span>
+            <span class="ep-total">{{ episodes | length }} episode{% if episodes | length != 1 %}s{% endif %}</span>
+        </div>
+    </div>
+
+    {% if message %}
+    <div class="empty-message">{{ message }}</div>
+    {% else %}
+
+    <div class="ep-browse-grid">
+        {% for ep in episodes %}
+        <a href="/player/{{ slug }}/{{ content_type }}/{{ loop.index0 }}" class="ep-card">
+            <div class="ep-card-thumb">
+                <!-- src set lazily by JS to avoid loading all videos at once -->
+                <video
+                    muted
+                    playsinline
+                    preload="metadata"
+                    data-src="/video_stream/{{ slug }}/{{ content_type }}/{{ ep.filename }}">
+                </video>
+                <div class="ep-card-overlay">
+                    <span class="ep-card-num">{{ ep.num }}</span>
+                    <div class="ep-card-play">&#9654;</div>
+                </div>
+            </div>
+            <div class="ep-card-info">
+                <span class="ep-card-label">Episode {{ ep.num }}</span>
+                <span class="ep-card-title">{{ ep.name }}</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% endif %}
+
+</div>
+
+<script>
+(function () {
+    var cards = Array.from(document.querySelectorAll('.ep-card'));
+
+    // ── Lazy-load video src when card approaches viewport ──
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            var vid = entry.target.querySelector('video');
+            if (vid && vid.dataset.src) {
+                vid.src = vid.dataset.src;
+                vid.removeAttribute('data-src');
+            }
+            io.unobserve(entry.target);
+        });
+    }, { rootMargin: '400px' });
+
+    cards.forEach(function (card) { io.observe(card); });
+
+    // ── Per-card behaviour ──
+    cards.forEach(function (card) {
+        var vid = card.querySelector('video');
+        var thumbTime = 0;
+
+        // Once we know the duration, pick a random moment as the static thumbnail
+        vid.addEventListener('loadedmetadata', function () {
+            if (isFinite(vid.duration) && vid.duration > 10) {
+                // Random point between 10 % and 75 % of duration
+                thumbTime = vid.duration * (0.10 + Math.random() * 0.65);
+                vid.currentTime = thumbTime;
+            }
+        });
+
+        // Hover: play from the thumbnail moment
+        card.addEventListener('mouseenter', function () {
+            if (!vid.src) return; // not loaded yet
+            vid.currentTime = thumbTime;
+            vid.play().catch(function () {});
+        });
+
+        // Leave: pause and snap back to the thumbnail frame
+        card.addEventListener('mouseleave', function () {
+            vid.pause();
+            vid.currentTime = thumbTime;
+        });
+    });
+})();
+</script>
+
+</body>
+</html>

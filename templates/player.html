@@ -1,164 +1,199 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="vi">
 <head>
-
-<title>{{ config.title }} - Playing</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-
-<style>
-
-.top-logo{
-width:100%;
-text-align:center;
-padding:15px 0;
-position:relative;
-z-index:10;
-}
-
-.top-logo .logo{
-font-family:'Inter',sans-serif;
-font-weight:900;
-font-size:26px;
-color:white;
-text-decoration:none;
-}
-
-.top-logo .logo span{
-color:var(--primary);
-}
-
-.video-js{
-width:100%;
-max-width:100%;
-height:500px;
-border-radius:8px;
-}
-
-@media (max-width:768px){
-.video-js{
-height:250px;
-}
-}
-
-/* EMPTY MESSAGE STYLE */
-
-.empty-message{
-display:flex;
-justify-content:center;
-align-items:center;
-text-align:center;
-height:400px;
-font-size:26px;
-font-weight:700;
-color:white;
-opacity:0.9;
-padding:20px;
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ config.title }} - Như Lùn Cinema</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
-
 <body>
 
-<div class="top-logo">
-<a href="/" class="logo">NHƯ LÙN<span>CINEMA</span></a>
-</div>
+<div class="page-bg" style="background-image: url('{{ config.poster }}');"></div>
 
-<div class="page-bg"
-style="background-image:linear-gradient(rgba(10,12,16,0.85),#0a0c10),url('{{ config.poster }}');">
-</div>
+<nav class="player-nav">
+    <a href="/" class="logo">
+        <img src="/static/posters/bg.jpg" alt="Logo" class="logo-img">
+        <span class="logo-text">
+            <span class="logo-name">NHƯ LÙN</span><span class="logo-suffix">CINEMA</span>
+        </span>
+    </a>
+    <span class="mode-badge">{{ content_type }} mode</span>
+    <a href="/choice/{{ slug }}" class="back-btn">← Switch Format</a>
+</nav>
 
 <div class="player-wrapper">
 
-<div style="display:flex;justify-content:space-between;align-items:center;">
+    {% if message %}
 
-<a href="/choice/{{ slug }}" class="back-btn">
-← Switch Format
-</a>
+    <div class="empty-message">{{ message }}</div>
 
-<span style="color:var(--primary);font-weight:bold;">
-{{ content_type | upper }} MODE
-</span>
+    {% else %}
 
-</div>
+    <div class="video-box">
+        <video
+            id="my-video"
+            class="video-js vjs-big-play-centered"
+            controls
+            preload="auto"
+            playsinline
+            webkit-playsinline>
+            <source
+                src="/video_stream/{{ slug }}/{{ content_type }}/{{ current_ep.filename }}"
+                type="video/mp4">
+            <p class="vjs-no-js">Please enable JavaScript and use a modern browser.</p>
+        </video>
+    </div>
 
-<h1 style="margin:15px 0;">
-{{ config.title }}
-</h1>
+    <div class="player-meta">
+        <h1 class="player-title">{{ config.title }}</h1>
+    </div>
+    <p class="now-playing">Now playing &mdash; Episode {{ current_ep.num }}</p>
 
-{% if message %}
+    <div class="details">
+        <div class="details-header">
+            <h3>Episodes</h3>
+            <span class="ep-count">{{ episodes | length }} total</span>
+        </div>
+        <div class="ep-grid">
+            {% for ep in episodes %}
+            <a
+                href="/player/{{ slug }}/{{ content_type }}/{{ loop.index0 }}"
+                class="ep-btn {% if ep_index == loop.index0 %}active{% endif %}"
+                data-src="/video_stream/{{ slug }}/{{ content_type }}/{{ ep.filename }}"
+                data-num="{{ ep.num }}">
+                <span class="ep-label">EP</span>
+                <span class="ep-num">{{ ep.num }}</span>
+                {% if ep_index == loop.index0 %}
+                <span class="ep-playing">▶ Playing</span>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
 
-<div class="empty-message">
-{{ message }}
-</div>
-
-{% else %}
-
-<p style="color:#aaa;margin-bottom:20px;">
-Playing: {{ current_ep.filename }}
-</p>
-
-<div class="video-box">
-
-<video
-id="my-video"
-class="video-js vjs-big-play-centered"
-controls
-preload="auto"
-playsinline
-webkit-playsinline
-data-setup='{}'>
-
-<source 
-src="{{ url_for('video_stream', slug=slug, content_type=content_type, filename=current_ep.filename, _external=True, _scheme='https') }}" 
-type="video/mp4">
-
-<p class="vjs-no-js">
-To view this video please enable JavaScript and use a modern browser.
-</p>
-
-</video>
-
-</div>
-
-<div class="details">
-
-<h3>Select Episode</h3>
-
-<div class="ep-grid">
-
-{% for ep in episodes %}
-
-<a
-href="/player/{{ slug }}/{{ content_type }}/{{ loop.index0 }}"
-class="ep-btn {% if ep_index == loop.index0 %}active{% endif %}">
-
-{{ ep.num }}
-
-</a>
-
-{% endfor %}
+    {% endif %}
 
 </div>
 
-</div>
-
-{% endif %}
-
+<!-- Episode hover preview popup -->
+<div id="ep-preview">
+    <video muted playsinline preload="none"></video>
+    <div class="preview-footer">
+        <span class="preview-label"></span>
+        <span class="preview-hint">Preview</span>
+    </div>
 </div>
 
 <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
 
 {% if not message %}
 <script>
-var player = videojs('my-video');
+// ── Video.js player ──
+var player = videojs('my-video', {
+    fluid: false,
+    responsive: false,
+    playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
+    userActions: {
+        hotkeys: function(e) {
+            if (e.which === 32) { e.preventDefault(); this.paused() ? this.play() : this.pause(); }
+            if (e.which === 37) { this.currentTime(Math.max(0, this.currentTime() - 10)); }
+            if (e.which === 39) { this.currentTime(this.currentTime() + 10); }
+            if (e.which === 38) { this.volume(Math.min(1, this.volume() + 0.1)); }
+            if (e.which === 40) { this.volume(Math.max(0, this.volume() - 0.1)); }
+        }
+    }
+});
+
+// Resume from saved position
+var storageKey = 'vp_{{ slug }}_{{ content_type }}_{{ ep_index }}';
+var saved = parseFloat(localStorage.getItem(storageKey));
+if (saved > 5) {
+    player.ready(function() {
+        player.one('loadedmetadata', function() { player.currentTime(saved); });
+    });
+}
+player.on('timeupdate', function() {
+    if (player.currentTime() > 5) {
+        localStorage.setItem(storageKey, player.currentTime());
+    }
+});
+player.on('ended', function() {
+    localStorage.removeItem(storageKey);
+    {% if episodes and ep_index < episodes|length - 1 %}
+    setTimeout(function() {
+        window.location.href = '/player/{{ slug }}/{{ content_type }}/{{ ep_index + 1 }}';
+    }, 2000);
+    {% endif %}
+});
+
+// ── Episode hover preview ──
+(function() {
+    var previewEl  = document.getElementById('ep-preview');
+    var previewVid = previewEl.querySelector('video');
+    var previewLbl = previewEl.querySelector('.preview-label');
+    var showTimer, hideTimer;
+    var loadedSrc  = '';
+
+    function showPreview(btn) {
+        var src = btn.dataset.src;
+        var num = btn.dataset.num;
+        var rect = btn.getBoundingClientRect();
+
+        var popW = 300, popH = 185;
+        var left = rect.left + rect.width / 2 - popW / 2;
+        var top  = rect.top  + window.scrollY  - popH - 14;
+
+        // Keep inside viewport horizontally
+        left = Math.max(8, Math.min(left, window.innerWidth - popW - 8));
+        // Flip below if too close to top
+        if (top < window.scrollY + 70) {
+            top = rect.bottom + window.scrollY + 14;
+            // Remove caret pointing down when flipped
+            previewEl.style.setProperty('--caret', 'none');
+        } else {
+            previewEl.style.setProperty('--caret', 'block');
+        }
+
+        previewEl.style.left = left + 'px';
+        previewEl.style.top  = top  + 'px';
+        previewLbl.textContent = 'Episode ' + num;
+
+        if (src !== loadedSrc) {
+            previewVid.src = src;
+            loadedSrc = src;
+        }
+        previewVid.currentTime = 0;
+        previewVid.play().catch(function() {});
+        previewEl.classList.add('visible');
+    }
+
+    function hidePreview() {
+        previewEl.classList.remove('visible');
+        previewVid.pause();
+    }
+
+    // Loop first 10 seconds of preview
+    previewVid.addEventListener('timeupdate', function() {
+        if (this.currentTime >= 10) this.currentTime = 0;
+    });
+
+    document.querySelectorAll('.ep-btn[data-src]').forEach(function(btn) {
+        btn.addEventListener('mouseenter', function() {
+            clearTimeout(hideTimer);
+            var self = this;
+            showTimer = setTimeout(function() { showPreview(self); }, 350);
+        });
+        btn.addEventListener('mouseleave', function() {
+            clearTimeout(showTimer);
+            hideTimer = setTimeout(hidePreview, 220);
+        });
+    });
+
+    previewEl.addEventListener('mouseenter', function() { clearTimeout(hideTimer); });
+    previewEl.addEventListener('mouseleave', hidePreview);
+})();
 </script>
 {% endif %}
 

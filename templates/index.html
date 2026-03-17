@@ -1,22 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-    <title>Private Cinema</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Như Lùn Cinema</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar"><a href="/" class="logo">NHƯ LÙN<span>CINEMA</span></a></nav>
-    <div class="container">
-        <h2 class="section-title">My Collections</h2>
-        <div class="movie-grid">
-            {% for slug, info in configs.items() %}
-            <a href="/choice/{{ slug }}" class="movie-card">
-                <img src="{{ info.poster }}" class="poster">
-                <div class="movie-info">{{ info.title }}</div>
-            </a>
-            {% endfor %}
+
+<nav class="navbar" id="navbar">
+    <a href="/" class="logo">
+        <img src="/static/posters/bg.jpg" alt="Logo" class="logo-img">
+        <span class="logo-text">
+            <span class="logo-name">NHƯ LÙN</span><span class="logo-suffix">CINEMA</span>
+        </span>
+    </a>
+</nav>
+
+<!-- Hero Carousel -->
+<section class="hero-slider" id="heroSlider">
+    {% for slug, info in configs.items() %}
+    <div class="hero-slide {% if loop.first %}active{% endif %}"
+         style="background-image: url('{{ info.poster }}');">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="hero-badge">Featured</span>
+            <h1 class="hero-title">{{ info.title }}</h1>
+            <p class="hero-desc">{{ info.desc }}</p>
+            <div class="hero-actions">
+                <a href="/choice/{{ slug }}" class="btn-primary">&#9654;&nbsp; Watch Now</a>
+                <a href="/choice/{{ slug }}" class="btn-secondary">&#9432;&nbsp; More Info</a>
+            </div>
         </div>
     </div>
+    {% endfor %}
+
+    <button class="slider-btn slider-prev" aria-label="Previous">&#8249;</button>
+    <button class="slider-btn slider-next" aria-label="Next">&#8250;</button>
+
+    <div class="slider-dots">
+        {% for slug in configs %}
+        <span class="dot {% if loop.first %}active{% endif %}"></span>
+        {% endfor %}
+    </div>
+
+    <!-- Progress bar that drains over 5s -->
+    <div class="slider-progress"><div class="slider-progress-bar" id="progressBar"></div></div>
+</section>
+
+<!-- Collections -->
+<div class="container">
+    <h2 class="section-title">My Collections</h2>
+    <div class="movie-grid">
+        {% for slug, info in configs.items() %}
+        <a href="/choice/{{ slug }}" class="movie-card">
+            <img src="{{ info.poster }}" class="poster" alt="{{ info.title }}" loading="lazy">
+            <div class="movie-info">{{ info.title }}</div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+(function() {
+    var slider   = document.getElementById('heroSlider');
+    var slides   = slider.querySelectorAll('.hero-slide');
+    var dots     = slider.querySelectorAll('.dot');
+    var bar      = document.getElementById('progressBar');
+    var current  = 0;
+    var timer, progTimer;
+    var INTERVAL = 5000;
+
+    function activate(n) {
+        slides[current].classList.remove('active');
+        dots[current].classList.remove('active');
+        current = ((n % slides.length) + slides.length) % slides.length;
+        slides[current].classList.add('active');
+        dots[current].classList.add('active');
+    }
+
+    function resetProgress() {
+        bar.style.transition = 'none';
+        bar.style.width = '0%';
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                bar.style.transition = 'width ' + INTERVAL + 'ms linear';
+                bar.style.width = '100%';
+            });
+        });
+    }
+
+    function startTimer() {
+        clearInterval(timer);
+        resetProgress();
+        timer = setInterval(function() {
+            activate(current + 1);
+            resetProgress();
+        }, INTERVAL);
+    }
+
+    slider.querySelector('.slider-prev').addEventListener('click', function() {
+        activate(current - 1); startTimer();
+    });
+    slider.querySelector('.slider-next').addEventListener('click', function() {
+        activate(current + 1); startTimer();
+    });
+
+    dots.forEach(function(dot, i) {
+        dot.addEventListener('click', function() { activate(i); startTimer(); });
+    });
+
+    // Pause on hover
+    slider.addEventListener('mouseenter', function() {
+        clearInterval(timer);
+        bar.style.transition = 'none';
+    });
+    slider.addEventListener('mouseleave', startTimer);
+
+    // Navbar solid on scroll
+    var nav = document.getElementById('navbar');
+    window.addEventListener('scroll', function() {
+        nav.classList.toggle('solid', window.scrollY > 60);
+    }, { passive: true });
+
+    startTimer();
+})();
+</script>
+
 </body>
 </html>
